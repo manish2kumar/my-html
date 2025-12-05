@@ -1,0 +1,35 @@
+name: Deploy HTML to EC2
+
+on:
+  push:
+    branches:
+      - main # Ya master, jo bhi aapki branch hai
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      # 1. Files ko Server pe Copy karo (SCP)
+      - name: Copy files via SSH
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ EC2_HOST}}
+          username: ${{ EC2_USER  }}
+          key: ${{ EC2_KEY }}
+          source: "." # Saari files uthao
+          target: "/home/ubuntu/project" # Server pe is folder me daalo
+
+      # 2. Server pe Script Run karo (SSH)
+      - name: Execute Deploy Script
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ EC2_HOST }}
+          username: ${{ EC2_USER }}
+          key: ${{ EC2_KEY }}
+          script: |
+            # Script chalao jo files ko sahi jagah move karegi
+            bash /home/ubuntu/my.sh
