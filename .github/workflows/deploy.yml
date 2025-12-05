@@ -3,7 +3,7 @@ name: Deploy HTML to EC2
 on:
   push:
     branches:
-      - main # Ya master, jo bhi aapki branch hai
+      - master # CHANGE 1: Aapki branch 'master' hai, 'main' nahi
 
 jobs:
   deploy:
@@ -17,19 +17,20 @@ jobs:
       - name: Copy files via SSH
         uses: appleboy/scp-action@master
         with:
-          host: ${{ EC2_HOST}}
-          username: ${{ EC2_USER  }}
-          key: ${{ EC2_KEY }}
-          source: "." # Saari files uthao
-          target: "/home/ubuntu/project" # Server pe is folder me daalo
+          # CHANGE 2: 'secrets.' keyword add kiya hai sab jagah
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "."
+          target: "/home/ubuntu/project"
 
       # 2. Server pe Script Run karo (SSH)
       - name: Execute Deploy Script
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ EC2_HOST }}
-          username: ${{ EC2_USER }}
-          key: ${{ EC2_KEY }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
           script: |
             # Script chalao jo files ko sahi jagah move karegi
             bash /home/ubuntu/my.sh
